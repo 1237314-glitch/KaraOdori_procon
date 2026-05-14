@@ -9,6 +9,35 @@
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+
+.side-panel {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    overflow-y: auto;
+  }
+
+.camera-area {
+    position: relative;
+    background: #000;
+    min-height: 500px;
+    /* ...中略... */
+  }
+
+  #canvas {
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform: scaleX(-1);
+  }
+
+  
+
+
+
+
   :root {
     --bg: #0d0d0f;
     --surface: #16161a;
@@ -95,30 +124,22 @@
 
   main {
     flex: 1;
-    display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .camera-area {
+    flex: 1; /* 残りの画面をすべてカメラに使う */
     position: relative;
     background: #000;
-    min-height: 500px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     overflow: hidden;
-    border-right: 1px solid var(--border);
   }
 
-  #video { display: none; }
-
   #canvas {
-    max-width: 100%;
-    max-height: 100%;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover; /* 隙間なく埋める（理想の2枚目の状態） */
     transform: scaleX(-1);
   }
 
@@ -164,10 +185,12 @@
   }
 
   .side-panel {
+    height: 30vh; /* 画面の下35%だけを使う。もっと小さくしたければ30vhに */
     display: flex;
     flex-direction: column;
     background: var(--surface);
     overflow-y: auto;
+    border-top: 1px solid var(--border);
   }
 
   .panel-section {
