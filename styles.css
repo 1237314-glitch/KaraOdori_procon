@@ -1,0 +1,564 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0d0d0f;
+  --surface: #16161a;
+  --surface2: #1e1e24;
+  --border: rgba(255,255,255,0.08);
+  --accent: #e8a020;
+  --accent2: #5dcaa5;
+  --text: #e8e6df;
+  --text2: #888780;
+  --danger: #e24b4a;
+  --success: #1d9e75;
+}
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-mark {
+  width: 32px;
+  height: 32px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: #0d0d0f;
+  letter-spacing: -0.5px;
+}
+
+.logo-text {
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.logo-sub {
+  font-size: 11px;
+  color: var(--text2);
+  font-weight: 400;
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text2);
+  background: var(--surface2);
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text2);
+  transition: background 0.3s;
+}
+.status-dot.active { background: var(--success); }
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.camera-area {
+  flex: 1; /* 残りの画面をすべてカメラに使う */
+  position: relative;
+  background: #000;
+  overflow: hidden;
+}
+
+#video {
+  display: none; /* ビデオ要素を非表示にする */
+}
+
+#canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 隙間なく埋める（理想の2枚目の状態） */
+  transform: scaleX(-1);
+}
+
+.camera-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: var(--text2);
+  text-align: center;
+  padding: 24px;
+}
+
+.placeholder-icon {
+  width: 64px;
+  height: 64px;
+  border: 2px dashed var(--border);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  opacity: 0.5;
+}
+
+.camera-placeholder p { font-size: 14px; line-height: 1.6; }
+.camera-placeholder .hint { font-size: 12px; opacity: 0.5; }
+
+.overlay-fps {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-size: 11px;
+  font-family: monospace;
+  color: var(--accent2);
+  background: rgba(0,0,0,0.6);
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: none;
+}
+
+.side-panel {
+  height: 45vh; /* 画面の下45%をUIパネルに使う */
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  overflow-y: auto;
+  border-top: 1px solid var(--border);
+}
+
+.panel-section {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.panel-section:last-child { border-bottom: none; }
+
+.section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin-bottom: 14px;
+}
+
+.btn {
+  width: 100%;
+  padding: 11px 16px;
+  border-radius: 8px;
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.01em;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #0d0d0f;
+}
+.btn-primary:hover { opacity: 0.8; transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+
+.btn-secondary {
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  margin-top: 8px;
+}
+.btn-secondary:hover { background: #26262e; }
+.btn-secondary:disabled { opacity: 0.4; cursor: default; transform: none; }
+
+.keypoints-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.kp-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  transition: border-color 0.2s;
+}
+
+.kp-item.detected { border-color: rgba(29,158,117,0.5); }
+.kp-item.low { border-color: rgba(226,75,74,0.3); }
+
+.kp-name {
+  font-size: 10px;
+  color: var(--text2);
+  margin-bottom: 3px;
+}
+
+.kp-value {
+  font-size: 12px;
+  font-family: monospace;
+  color: var(--text);
+}
+
+.angle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.angle-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.angle-name { font-size: 12px; color: var(--text2); }
+
+.angle-bar-wrap {
+  flex: 1;
+  height: 4px;
+  background: var(--surface2);
+  border-radius: 2px;
+  margin: 0 10px;
+  overflow: hidden;
+}
+
+.angle-bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.1s;
+}
+
+.angle-val {
+  font-size: 12px;
+  font-family: monospace;
+  color: var(--text);
+  min-width: 40px;
+  text-align: right;
+}
+
+.message-area {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.6;
+  min-height: 40px;
+}
+
+.message-area.error { color: var(--danger); }
+.message-area.ok { color: var(--success); }
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.toggle-label { font-size: 12px; color: var(--text); }
+
+.toggle {
+  position: relative;
+  width: 36px;
+  height: 20px;
+}
+
+.toggle input { opacity: 0; width: 0; height: 0; }
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: var(--text2);
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.toggle input:checked + .toggle-slider { background: rgba(29,158,117,0.3); border-color: var(--success); }
+.toggle input:checked + .toggle-slider::before { transform: translateX(16px); background: var(--success); }
+
+footer {
+  padding: 12px 24px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--text2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface);
+}
+
+.footer-badges {
+  display: flex;
+  gap: 8px;
+}
+
+.badge {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-family: monospace;
+  color: var(--text2);
+}
+
+.btn-record {
+  background: var(--danger);
+  color: #fff;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-record:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn-record:disabled { opacity: 0.4; cursor: default; transform: none; }
+
+.rec-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  flex-shrink: 0;
+}
+.recording .rec-dot { animation: pulse 0.8s ease-in-out infinite; }
+
+.rec-timer {
+  font-family: monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--danger);
+  text-align: center;
+  margin-top: 8px;
+  display: none;
+  letter-spacing: 0.05em;
+}
+
+.rec-counter {
+  font-size: 11px;
+  color: var(--text2);
+  text-align: center;
+  margin-top: 4px;
+  display: none;
+  font-family: monospace;
+}
+
+.takes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.take-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.take-info { flex: 1; min-width: 0; }
+
+.take-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.take-meta {
+  font-size: 10px;
+  color: var(--text2);
+  font-family: monospace;
+  margin-top: 2px;
+}
+
+.take-actions { display: flex; gap: 4px; }
+
+.take-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--text2);
+  font-size: 11px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.take-btn:hover { background: #26262e; color: var(--text); }
+.take-btn.dl { color: var(--accent2); border-color: rgba(93,202,165,0.3); }
+.take-btn.dl:hover { background: rgba(93,202,165,0.1); }
+.take-btn.del { color: var(--danger); border-color: rgba(226,75,74,0.3); }
+.take-btn.del:hover { background: rgba(226,75,74,0.1); }
+
+.empty-takes {
+  font-size: 12px;
+  color: var(--text2);
+  text-align: center;
+  padding: 16px 0;
+  line-height: 1.6;
+}
+
+.json-preview-wrap {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  font-family: monospace;
+  font-size: 10px;
+  color: var(--accent2);
+  max-height: 120px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  display: none;
+  margin-top: 8px;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.loading-pulse { animation: pulse 1.2s ease-in-out infinite; }
+
+.main-content {
+  display: flex;
+  flex-direction: column; /* 縦並びにする */
+  height: 100vh; /* 画面の高さいっぱいに広げる */
+  overflow: hidden;
+}
+
+/* --- 緑色の部分（カメラ映像エリア） --- */
+.video-container {
+  flex: 1; /* 余ったスペース（上部）をすべて使う */
+  position: relative;
+  background-color: #2c3e50; /* 必要なら緑(#00ff00)に変更してください */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.video-container video, 
+.video-container canvas {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 画面いっぱいに映像を広げる */
+}
+
+/* --- 下のUI部分（ダッシュボード） --- */
+.dashboard {
+  height: 200px; /* 下部パネルの高さ */
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around; /* 要素を均等に配置 */
+  align-items: center;
+  padding: 16px;
+}
+
+/* --- 赤い丸（スコア表示） --- */
+.score-circle {
+  width: 120px;
+  height: 120px;
+  background-color: #e24b4a; /* 赤色 */
+  border-radius: 50%; /* 丸くする */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.score-label {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.score-value {
+  font-size: 42px;
+  font-weight: bold;
+}
+
+/* --- ここから追加：映像の上にスコアを浮かせる設定 --- */
+.score-overlay {
+  position: absolute;
+  bottom: 20px;   /* 下からの距離 */
+  right: 20px;    /* 右からの距離 */
+  z-index: 100;   /* 他の要素より手前に表示 */
+  pointer-events: none; /* タップ操作を透過させる */
+}
+
+.score-circle {
+  width: 100px;
+  height: 100px;
+  background-color: rgba(226, 75, 74, 0.9); /* 赤（少し透明） */
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+/* --- ここまで追加 --- */
