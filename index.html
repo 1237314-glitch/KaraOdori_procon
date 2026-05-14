@@ -9,35 +9,6 @@
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-
-.side-panel {
-    display: flex;
-    flex-direction: column;
-    background: var(--surface);
-    overflow-y: auto;
-  }
-
-.camera-area {
-    position: relative;
-    background: #000;
-    min-height: 500px;
-    /* ...中略... */
-  }
-
-  #canvas {
-    max-width: 100%;
-    max-height: 100%;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transform: scaleX(-1);
-  }
-
-  
-
-
-
-
   :root {
     --bg: #0d0d0f;
     --surface: #16161a;
@@ -571,6 +542,29 @@
     font-size: 42px;
     font-weight: bold;
   }
+
+  /* --- ここから追加：映像の上にスコアを浮かせる設定 --- */
+  .score-overlay {
+    position: absolute;
+    bottom: 20px;   /* 下からの距離 */
+    right: 20px;    /* 右からの距離 */
+    z-index: 100;   /* 他の要素より手前に表示 */
+    pointer-events: none; /* タップ操作を透過させる */
+  }
+
+  .score-circle {
+    width: 100px;
+    height: 100px;
+    background-color: rgba(226, 75, 74, 0.9); /* 赤（少し透明） */
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+/* --- ここまで追加 --- */
 </style>
 </head>
 <body>
@@ -594,6 +588,11 @@
     <video id="video" autoplay playsinline muted></video>
     <canvas id="canvas"></canvas>
     <div class="overlay-fps" id="fpsDisplay">-- fps</div>
+    <div class="dashboard">
+      <div class="score-circle">
+        <span class="score-label">SCORE</span>
+        <span class="score-value" id="total-score-val">0</span>
+      </div>
 
     <div class="camera-placeholder" id="placeholder">
       <div class="placeholder-icon">&#128247;</div>
@@ -603,12 +602,6 @@
   </div>
 
   <div class="side-panel">
-    <div class="dashboard">
-      <div class="score-circle">
-        <span class="score-label">SCORE</span>
-        <span class="score-value" id="total-score-val">0</span>
-      </div>
-    </div>
     <div class="message-area" id="score-message" style="text-align: center; margin-bottom: 16px;"></div>
     <div class="panel-section">
       <div class="section-label">コントロール</div>
